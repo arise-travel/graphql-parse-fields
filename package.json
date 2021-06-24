@@ -10,7 +10,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/tjmehta/graphql-parse-fields.git"
+    "url": "git+https://github.com/arise-travel/graphql-parse-fields.git"
   },
   "keywords": [
     "graphql",
@@ -28,9 +28,9 @@
   "author": "Tejesh Mehta",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/@arise-travel/graphql-parse-fields/issues"
+    "url": "https://github.com/arise-travel/graphql-parse-fields/issues"
   },
-  "homepage": "https://github.com/@arise-travel/graphql-parse-fields#readme",
+  "homepage": "https://github.com/arise-travel/graphql-parse-fields#readme",
   "dependencies": {
     "cast-array": "^1.0.1"
   },
