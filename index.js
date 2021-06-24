@@ -53,8 +53,8 @@ function fieldTreeFromAST (asts, fragments, init) {
       }
       if (val.selectionSet) {
         tree[name] = tree[name] || {}
-        tree[name].children = tree[name].children || {}
-        fieldTreeFromAST(val.selectionSet.selections, fragments, tree[name])
+        tree[name].fields = tree[name].fields || {}
+        fieldTreeFromAST(val.selectionSet.selections, fragments, tree[name].fields)
       } else {
         tree[name].key = true
       }
