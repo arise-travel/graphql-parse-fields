@@ -32,7 +32,7 @@ function parseFields (/* dynamic */) {
     }
   } else {
     // (asts, fragments, fieldTree)
-    tree = fieldTreeFromAST.apply(this, arguments)
+    const tree = fieldTreeFromAST.apply(this, arguments)
   }
   return tree
 }
@@ -46,11 +46,17 @@ function fieldTreeFromAST (asts, fragments, init) {
     var name = val.name && val.name.value
     var fragment
     if (kind === 'Field') {
+      if(val.arguments){
+        tree[name] = tree[name] || {}
+        tree[name].arguments = tree[name].arguments || {}
+        val.arguments.forEach( arg => { tree[name].arguments[arg.name.value] = arg.value.value } )
+      }
       if (val.selectionSet) {
         tree[name] = tree[name] || {}
+        tree[name].children = tree[name].children || {}
         fieldTreeFromAST(val.selectionSet.selections, fragments, tree[name])
       } else {
-        tree[name] = true
+        tree[name].key = true
       }
     } else if (kind === 'FragmentSpread') {
       fragment = fragments[name]
