@@ -25,19 +25,19 @@ function parseFields (/* dynamic */) {
   var fieldNodes = info && (info.fieldASTs || info.fieldNodes)
   if (fieldNodes) {
     // (info, keepRoot)
-    tree = fieldTreeFromAST(fieldNodes, info.fragments)
+    tree = fieldTreeFromAST(fieldNodes, info.fragments, undefined, info)
     if (!keepRoot) {
       var key = firstKey(tree)
       tree = tree[key]
     }
   } else {
     // (asts, fragments, fieldTree)
-    const tree = fieldTreeFromAST.apply(this, arguments)
+    const tree = fieldTreeFromAST.apply(this, [...arguments, info])
   }
   return tree
 }
 
-function argumentTreeFromAST (asts, fragments, init) {
+function argumentTreeFromAST (asts, fragments, init, info) {
   init = init || {}
   fragments = fragments || {}
   asts = castArr(asts)
@@ -46,18 +46,21 @@ function argumentTreeFromAST (asts, fragments, init) {
     var name = val.name && val.name.value
     if (kind === 'Argument') {
       tree[name] = tree[name] || {}
-      argumentTreeFromAST(val.value, fragments, tree[name])
+      argumentTreeFromAST(val.value, fragments, tree[name], info)
     } else if(kind == "ObjectField"){
       tree[name] = tree[name] || {}
       tree[name] = val.value.value
+      if (val.value.kind == "Variable") {
+        tree[name] = info.variableValues[val.value.name.value]
+      }
     } else if(kind == "ObjectValue"){
-      argumentTreeFromAST(val.fields, fragments, tree)
+      argumentTreeFromAST(val.fields, fragments, tree, info)
     }
     return tree
   }, init)
 }
 
-function fieldTreeFromAST (asts, fragments, init) {
+function fieldTreeFromAST (asts, fragments, init, info) {
   init = init || {}
   fragments = fragments || {}
   asts = castArr(asts)
@@ -70,13 +73,13 @@ function fieldTreeFromAST (asts, fragments, init) {
         tree[name] = tree[name] || {}
         tree[name].arguments = tree[name].arguments || {}
         if(val.arguments.length > 0){
-          argumentTreeFromAST(val.arguments, fragments, tree[name].arguments)
+          argumentTreeFromAST(val.arguments, fragments, tree[name].arguments, info)
         }
       }
       if (val.selectionSet) {
         tree[name] = tree[name] || {}
         tree[name].fields = tree[name].fields || {}
-        fieldTreeFromAST(val.selectionSet.selections, fragments, tree[name].fields)
+        fieldTreeFromAST(val.selectionSet.selections, fragments, tree[name].fields, info)
       } else {
         tree[name] = tree[name] || {}
         tree[name].key = true
@@ -84,10 +87,10 @@ function fieldTreeFromAST (asts, fragments, init) {
     } else if (kind === 'FragmentSpread') {
       fragment = fragments[name]
       assert(fragment, 'unknown fragment "' + name + '"')
-      fieldTreeFromAST(fragment.selectionSet.selections, fragments, tree)
+      fieldTreeFromAST(fragment.selectionSet.selections, fragments, tree, info)
     } else if (kind === 'InlineFragment') {
       fragment = val
-      fieldTreeFromAST(fragment.selectionSet.selections, fragments, tree)
+      fieldTreeFromAST(fragment.selectionSet.selections, fragments, tree, info)
     } // else ignore
     return tree
   }, init)
