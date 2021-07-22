@@ -1,6 +1,6 @@
 {
   "name": "@arise-travel/graphql-parse-fields",
-  "version": "2.0.3",
+  "version": "2.1.0",
   "description": "Parse fields from AST (GraphQLResolveInfo) into a JSON tree",
   "main": "index.js",
   "scripts": {
